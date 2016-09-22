@@ -1,0 +1,22 @@
+<div class="todo-container">
+
+  <div>
+    <h1>{{title}}</h1>
+  </div>
+
+  <div class="todo-list">
+    <div *ngFor="let user of users;"
+         class="todo-item">
+      <div class="row">
+        <div class="col-md-4">
+          <img src="./common/images/{{icon}}.png" style="max-width: 20%;" alt="something">
+        </div>
+        <div class="col-md-8">
+          {{user}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
