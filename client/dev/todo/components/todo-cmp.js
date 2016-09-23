@@ -16,6 +16,12 @@ var TodoCmp = (function () {
         this.title = "NAbs";
         this.users = [];
         this.icon = 1;
+        this.usersAndIcon = [];
+        this.selectedUser = { name: "", icon: 0 };
+        this.selectedUserObject = null;
+        this.selectedNotification = { notificationId: -1, date: Date };
+        this.selectedNotificationObject = null;
+        this.calendarEvents = null;
         this.todoForm = {
             "todoMessage": ""
         };
@@ -30,12 +36,55 @@ var TodoCmp = (function () {
     }
     TodoCmp.prototype.ngOnInit = function () {
         this.getUserList();
+        this.getSelectedUser();
+        this.getCalendar();
+    };
+    TodoCmp.prototype.getSelectedUser = function () {
+        var userList = firebase.database().ref('web/selectedUserObject');
+        userList.on('value', function (snapshot) {
+            this.selectedUserObject = snapshot.val();
+        }.bind(this));
+    };
+    TodoCmp.prototype.getCalendar = function () {
+        var calendarList = firebase.database().ref('web/calendarEvents');
+        calendarList.on('value', function (snapshot) {
+            this.calendarEvents = snapshot.val();
+        }.bind(this));
     };
     TodoCmp.prototype.getUserList = function () {
         var userList = firebase.database().ref('web/userStrings');
         userList.on('value', function (snapshot) {
             this.users = snapshot.val();
+            for (var _i = 0, _a = this.users; _i < _a.length; _i++) {
+                var user = _a[_i];
+                var iconNumber = Math.floor(Math.random() * 34) + 1;
+                this.usersAndIcon.push({ name: user, icon: iconNumber });
+            }
         }.bind(this));
+    };
+    TodoCmp.prototype.userSelected = function (user) {
+        if (user.name != this.selectedUser.name) {
+            this.selectedUser = user;
+            this.selectedUserObject = null;
+            this.selectedNotificationObject = null;
+            var selUser = firebase.database().ref('web/selectedUser');
+            selUser.set(user.name);
+        }
+    };
+    TodoCmp.prototype.notificationSelected = function (notification) {
+        console.log(notification.notificationId);
+        console.log(this.selectedNotification.notificationId);
+        if (notification.notificationId != this.selectedNotification.notificationId) {
+            this.calendarEvents = null;
+            this.selectedNotification = notification;
+            this.selectedNotificationObject = null;
+            var selNotification = firebase.database().ref('web/selectedNotification');
+            selNotification.set(notification);
+        }
+    };
+    TodoCmp.prototype.sendNotification = function () {
+        var epoch = (new Date).getTime();
+        firebase.database().ref('web/fire/').set(this.selectedNotification);
     };
     TodoCmp.prototype.add = function (message) {
     };

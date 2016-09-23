@@ -14,6 +14,9 @@ var forms_1 = require('@angular/forms');
 var platform_browser_1 = require('@angular/platform-browser');
 var todo_cmp_1 = require('./todo/components/todo-cmp');
 var todo_service_1 = require('./todo/services/todo-service');
+var app_routing_1 = require('./app.routing');
+var bead_sim_cmp_1 = require('./bead-sim/components/bead-sim-cmp');
+var bead_sim_service_1 = require("./bead-sim/services/bead-sim-service");
 var AppModule = (function () {
     function AppModule() {
     }
@@ -23,12 +26,16 @@ var AppModule = (function () {
                 platform_browser_1.BrowserModule,
                 forms_1.FormsModule,
                 http_1.HttpModule,
+                app_routing_1.routing,
             ],
             declarations: [
                 todo_cmp_1.TodoCmp,
+                bead_sim_cmp_1.BeadSimCmp,
             ],
             providers: [
                 todo_service_1.TodoService,
+                bead_sim_service_1.BeadSimService,
+                app_routing_1.appRoutingProviders
             ],
             bootstrap: [
                 todo_cmp_1.TodoCmp,
