@@ -17,6 +17,8 @@ var todo_service_1 = require('./todo/services/todo-service');
 var app_routing_1 = require('./app.routing');
 var bead_sim_cmp_1 = require('./bead-sim/components/bead-sim-cmp');
 var bead_sim_service_1 = require("./bead-sim/services/bead-sim-service");
+var explore_service_1 = require("./explore/services/explore-service");
+var explore_cmp_1 = require("./explore/components/explore-cmp");
 var AppModule = (function () {
     function AppModule() {
     }
@@ -31,10 +33,12 @@ var AppModule = (function () {
             declarations: [
                 todo_cmp_1.TodoCmp,
                 bead_sim_cmp_1.BeadSimCmp,
+                explore_cmp_1.ExploreCmp,
             ],
             providers: [
                 todo_service_1.TodoService,
                 bead_sim_service_1.BeadSimService,
+                explore_service_1.ExploreService,
                 app_routing_1.appRoutingProviders
             ],
             bootstrap: [

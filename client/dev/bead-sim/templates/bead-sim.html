@@ -4,65 +4,13 @@
     <h1>{{title}}</h1>
   </div>
 
-  <div class="row">
-
-    <div class="col-md-4" style="min-height:50px;max-height: 500px; overflow-y: scroll;">
-      <div class="todo-list">
-        <div *ngFor="let user of usersAndIcon;"
-             class="todo-item">
-          <div class="row" (click)="userSelected(user);">
-            <div class="col-md-4">
-              <img src="./common/images/{{user.icon}}.png" style="max-width: 20%;" alt="something">
-            </div>
-            <div class="col-md-8">
-              {{user.name}}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-8">
-      <div class="row">
-        <div *ngIf="selectedUserObject!=null">
-          <div class="col-md-12">
-            <h3><strong>Id:</strong> {{selectedUserObject.id}}</h3>
-              <button type="button" class="btn btn-default" (click)="sendNotification();">Send</button>
-            <br>
-            <h3><strong>Student:</strong> {{selectedUserObject.student}}</h3>
-          </div>
-        </div>
-        <div *ngIf="selectedUserObject == null">
-          User is null
-        </div>
-      </div>
-
-      <div class="row">
-        <div *ngIf="selectedUserObject!=null">
-          <div class="col-md-6" style="min-height:50px;max-height: 300px; overflow-y: scroll;">
-            <div *ngFor="let notification of selectedUserObject.notifications;"
-                 class="todo-item">
-              <div class="row" (click)="notificationSelected(notification);">
-                <h5>{{notification.notificationId}}: </h5>{{notification.date}}
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6" *ngIf="calendarEvents!=null" style="min-height:50px;max-height: 300px; overflow-y: scroll;">
-            <div *ngFor="let event of calendarEvents;"
-                 class="todo-item">
-              <div class="row">
-                <h4><strong>Description:</strong> {{event.description}}</h4>
-                <br>
-                <h4><strong>Start Date:</strong> {{event.startDate}}</h4>
-                <br>
-                <h4><strong>End Date:</strong> {{event.endDate}}</h4>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
+  <div>
+    <h5>Notification bead: </h5>{{notificationBead?.operational?.informationItem?.informationValue}}<br>
+    <h5>Sender bead: </h5>{{senderBead?.operational?.informationItem?.informationValue}}<br>
+    <h5>Subject bead: </h5>{{subjectBead?.operational?.informationItem?.informationValue}}<br>
+    <h5>App bead: </h5>{{appBead?.operational?.informationItem?.informationValue}}<br>
+    <h5>Location bead: </h5>{{locationBead?.operational?.informationItem?.informationValue}}<br>
+    <h5>Alert bead: </h5>{{alertBead?.operational?.informationItem?.informationValue}}<br>
   </div>
 
 </div>

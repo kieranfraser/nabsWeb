@@ -8,6 +8,8 @@ import { routing, appRoutingProviders } from './app.routing';
 
 import { BeadSimCmp } from './bead-sim/components/bead-sim-cmp';
 import {BeadSimService} from "./bead-sim/services/bead-sim-service";
+import {ExploreService} from "./explore/services/explore-service";
+import {ExploreCmp} from "./explore/components/explore-cmp";
 
 @NgModule({
     imports: [
@@ -19,10 +21,12 @@ import {BeadSimService} from "./bead-sim/services/bead-sim-service";
    declarations: [
       TodoCmp,
       BeadSimCmp,
+      ExploreCmp,
     ],
     providers: [
       TodoService,
       BeadSimService,
+      ExploreService,
       appRoutingProviders
     ],
     bootstrap: [

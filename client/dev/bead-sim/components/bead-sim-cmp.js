@@ -16,6 +16,62 @@ var BeadSimCmp = (function () {
         this.title = "Bead Simulation";
     }
     BeadSimCmp.prototype.ngOnInit = function () {
+        console.log("bead simulate init");
+        this.subscribeToWebEvents();
+    };
+    BeadSimCmp.prototype.subscribeToWebEvents = function () {
+        this.subscribeToNotificaitonBead();
+        this.subscribeToSenderBead();
+        this.subscribeToSubjectBead();
+        this.subscribeToAppBead();
+        this.subscribeToLocationInfoBead();
+        this.subscribeToAlertInfoBead();
+    };
+    BeadSimCmp.prototype.subscribeToNotificaitonBead = function () {
+        firebase.database().ref('BeadRepo/NOTIFICATION/').on('value', function (snapshot) {
+            console.log(snapshot.val());
+            this.notificationBead = snapshot.val();
+        }.bind(this));
+    };
+    BeadSimCmp.prototype.subscribeToSenderBead = function () {
+        firebase.database().ref('BeadRepo/SENDER/').on('value', function (snapshot) {
+            console.log(snapshot.val());
+            this.senderBead = snapshot.val();
+        }.bind(this));
+    };
+    BeadSimCmp.prototype.subscribeToSubjectBead = function () {
+        firebase.database().ref('BeadRepo/SUBJECT/').on('value', function (snapshot) {
+            console.log(snapshot.val());
+            this.subjectBead = snapshot.val();
+        }.bind(this));
+    };
+    BeadSimCmp.prototype.subscribeToAppBead = function () {
+        firebase.database().ref('BeadRepo/APPLICATION/').on('value', function (snapshot) {
+            console.log(snapshot.val());
+            this.appBead = snapshot.val();
+        }.bind(this));
+    };
+    BeadSimCmp.prototype.subscribeToLocationInfoBead = function () {
+        firebase.database().ref('BeadRepo/LOCATION/').on('value', function (snapshot) {
+            console.log(snapshot.val());
+            this.locationBead = snapshot.val();
+        }.bind(this));
+    };
+    BeadSimCmp.prototype.subscribeToAlertInfoBead = function () {
+        firebase.database().ref('BeadRepo/ALERT/').on('value', function (snapshot) {
+            console.log(snapshot.val());
+            this.alertBead = snapshot.val();
+            this.sendNotification();
+        }.bind(this));
+    };
+    BeadSimCmp.prototype.sendNotification = function () {
+        firebase.database().ref('web/selectedNotification').on('value', function (snapshot) {
+            var notification = snapshot.val();
+            this.fire(notification);
+        }.bind(this));
+    };
+    BeadSimCmp.prototype.fire = function (notification) {
+        firebase.database().ref('web/fire/').set(notification);
     };
     BeadSimCmp = __decorate([
         core_1.Component({

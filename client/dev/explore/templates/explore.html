@@ -1,0 +1,125 @@
+
+
+<div>
+  <h1>{{title}}</h1>
+</div>
+
+<div class="row">
+
+  <div class="col-md-2" >
+    <div class="list-group" style="overflow-y: scroll; max-height: 500px">
+      <a *ngFor="let user of usersAndIcon;"
+           class="list-group-item" style="text-align: center;" [ngClass]="{ 'selected': user.active }">
+        <div class="row" (click)="userSelected(user);" style="display: flex; align-items: center;">
+          <div>
+            <img src="./common/images/{{user.icon}}.png" style="max-width: 55%;" alt="something">
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-10" *ngIf="selectedUserObject!=null">
+
+    <div class="row">
+
+      <div class="col-md-12">
+        <table class="table">
+          <tbody>
+            <tr>
+              <th>Id</th>
+                <td>{{selectedUserObject?.id}}</td>
+            </tr>
+            <tr>
+              <th>Student</th>
+                <td>{{selectedUserObject?.student}}</td>
+            </tr>
+            <tr>
+              <th>No. Notifications</th>
+              <td>{{selectedUserObject?.notifications?.length}}</td>
+            </tr>
+            <tr>
+              <th>Agreeableness</th>
+              <td>{{selectedUserObject?.personality?.agreeableness}}</td>
+            </tr>
+            <tr>
+              <th>Conscientiousness</th>
+              <td>{{selectedUserObject?.personality?.conscientiousness}}</td>
+            </tr>
+            <tr>
+              <th>Extraversion</th>
+              <td>{{selectedUserObject?.personality?.extraversion}}</td>
+            </tr>
+            <tr>
+              <th>Neuroticism</th>
+              <td>{{selectedUserObject?.personality?.neuroticism}}</td>
+            </tr>
+            <tr>
+              <th>Openness</th>
+              <td>{{selectedUserObject?.personality?.openness}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+      <div *ngIf="selectedUserObject == null">
+        User is null
+      </div>
+
+    </div>
+    <div class="row">
+      <div *ngIf="selectedUserObject!=null">
+
+        <div class="col-md-6" style="min-height:50px;max-height: 300px; overflow-y: scroll;">
+          <table class="table">
+            <thead>
+            <tr>
+              <th>Id</th>
+              <th>Date</th>
+              <th>Sender</th>
+              <th>Sender Rank</th>
+              <th>Subject</th>
+              <th>Subject Rank</th>
+              <th>App</th>
+              <th>App Rank</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="pointer" *ngFor="let notification of selectedUserObject.notifications;" (click)="notificationSelected(notification);"
+                [ngClass]="{ 'selected': notification?.active }">
+              <td>{{notification?.notificationId}}</td>
+              <td>{{notification?.date}}</td>
+              <td>{{notification?.sender}}</td>
+              <td>{{notification?.senderRank}}</td>
+              <td class="tool" data-html="true" data-toggle="tooltip" data-placement="right"
+                  title="Dataset: {{notification?.subject?.dataset}} <br> Ground truth: {{notification?.subject?.ground_truth}}">{{notification?.subject?.subject}}</td>
+              <td>{{notification?.subjectRank}}</td>
+              <td data-toggle="tooltip" data-placement="right"
+                  title="Category: {{notification?.app?.category}}">{{notification?.app?.name}}</td>
+              <td>{{notification?.appRank}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+
+
+        <div class="col-md-6" *ngIf="calendarEvents!=null" style="min-height:50px;max-height: 300px; overflow-y: scroll;">
+          <div *ngFor="let event of calendarEvents;"
+               class="todo-item">
+            <div class="row">
+              <h4><strong>Description:</strong> {{event.description}}</h4>
+              <br>
+              <h4><strong>Start Date:</strong> {{event.startDate}}</h4>
+              <br>
+              <h4><strong>End Date:</strong> {{event.endDate}}</h4>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
