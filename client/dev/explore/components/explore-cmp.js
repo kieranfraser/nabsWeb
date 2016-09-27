@@ -9,29 +9,49 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var router_1 = require('@angular/router');
 var explore_service_1 = require('../services/explore-service');
 var ExploreCmp = (function () {
-    function ExploreCmp(_todoService) {
+    function ExploreCmp(_todoService, route, router) {
         this._todoService = _todoService;
+        this.route = route;
+        this.router = router;
         this.title = "Explore";
         this.users = [];
+        this.userObjects = [];
         this.icon = 1;
         this.usersAndIcon = [];
-        this.selectedUser = { name: "", icon: 0, active: false };
         this.selectedUserObject = null;
         this.selectedNotification = { notificationId: -1, date: Date, active: false };
         this.selectedNotificationObject = null;
         this.calendarEvents = null;
+        this.getUserList();
     }
     ExploreCmp.prototype.ngOnInit = function () {
-        this.getUserList();
-        this.getSelectedUser();
-        this.getCalendar();
+        //this.getSelectedUser();
+        //this.getCalendar();
+        this.checkSelectedUser();
     };
-    ExploreCmp.prototype.getSelectedUser = function () {
+    ExploreCmp.prototype.checkSelectedUser = function () {
         var userList = firebase.database().ref('web/selectedUserObject');
-        userList.on('value', function (snapshot) {
-            this.selectedUserObject = snapshot.val();
+        userList.once('value', function (snapshot) {
+            if (snapshot.val() != null) {
+                for (var _i = 0, _a = this.userObjects; _i < _a.length; _i++) {
+                    var user = _a[_i];
+                    if (user.id == snapshot.val().id) {
+                        console.log(user.id);
+                        console.log(snapshot.val().id);
+                        this.selectedUserObject = user;
+                        for (var _b = 0, _c = this.usersAndIcon; _b < _c.length; _b++) {
+                            var a = _c[_b];
+                            if (a.userObject.id == snapshot.val().id) {
+                                a.active = true;
+                            }
+                        }
+                        firebase.database().ref('web/results').remove();
+                    }
+                }
+            }
         }.bind(this));
     };
     ExploreCmp.prototype.getCalendar = function () {
@@ -41,45 +61,51 @@ var ExploreCmp = (function () {
         }.bind(this));
     };
     ExploreCmp.prototype.getUserList = function () {
-        var userList = firebase.database().ref('web/userStrings');
+        var userList = firebase.database().ref('web/test');
         userList.on('value', function (snapshot) {
-            this.users = snapshot.val();
-            for (var _i = 0, _a = this.users; _i < _a.length; _i++) {
+            this.userObjects = snapshot.val();
+            for (var _i = 0, _a = this.userObjects; _i < _a.length; _i++) {
                 var user = _a[_i];
+                this.users.push(user.id);
                 var iconNumber = Math.floor(Math.random() * 34) + 1;
-                this.usersAndIcon.push({ name: user, icon: iconNumber, active: false });
+                this.usersAndIcon.push({ userObject: user, icon: iconNumber, active: false });
             }
         }.bind(this));
     };
     ExploreCmp.prototype.userSelected = function (user) {
-        if (user.name != this.selectedUser.name) {
-            for (var _i = 0, _a = this.usersAndIcon; _i < _a.length; _i++) {
-                var a = _a[_i];
-                a.active = false;
-            }
-            user.active = true;
-            this.selectedUser = user;
-            this.selectedUserObject = null;
-            this.selectedNotificationObject = null;
-            var selUser = firebase.database().ref('web/selectedUser');
-            selUser.set(user.name);
-        }
-    };
-    ExploreCmp.prototype.notificationSelected = function (notification) {
-        console.log(notification.notificationId);
-        console.log(this.selectedNotification.notificationId);
-        for (var _i = 0, _a = this.selectedUserObject.notifications; _i < _a.length; _i++) {
+        for (var _i = 0, _a = this.usersAndIcon; _i < _a.length; _i++) {
             var a = _a[_i];
             a.active = false;
         }
-        this.selectedNotification.active = true;
-        if (notification.notificationId != this.selectedNotification.notificationId) {
+        for (var _b = 0, _c = this.userObjects; _b < _c.length; _b++) {
+            var u = _c[_b];
+            if (user.userObject == u) {
+                user.active = true;
+                this.selectedUserObject = u;
+                this.selectedNotificationObject = null;
+                firebase.database().ref('web/results').remove();
+            }
+        }
+    };
+    ExploreCmp.prototype.notificationSelected = function (notification) {
+        console.log(notification.id);
+        console.log(this.selectedNotification.id);
+        if (notification.id != this.selectedNotification.id) {
+            for (var _i = 0, _a = this.selectedUserObject.notifications; _i < _a.length; _i++) {
+                var a = _a[_i];
+                a.active = false;
+            }
+            notification.active = true;
             this.calendarEvents = null;
             this.selectedNotification = notification;
-            this.selectedNotificationObject = null;
             var selNotification = firebase.database().ref('web/selectedNotification');
             selNotification.set(notification);
         }
+    };
+    ExploreCmp.prototype.simSingle = function () {
+        var selNotification = firebase.database().ref('web/fireSingle');
+        selNotification.set(this.selectedNotification);
+        this.router.navigate(['bead-simulation']);
     };
     ExploreCmp = __decorate([
         core_1.Component({
@@ -87,7 +113,7 @@ var ExploreCmp = (function () {
             templateUrl: 'explore/templates/explore.html',
             styleUrls: ['explore/styles/explore.css']
         }), 
-        __metadata('design:paramtypes', [explore_service_1.ExploreService])
+        __metadata('design:paramtypes', [explore_service_1.ExploreService, router_1.ActivatedRoute, router_1.Router])
     ], ExploreCmp);
     return ExploreCmp;
 }());

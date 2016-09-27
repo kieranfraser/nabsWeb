@@ -5,6 +5,7 @@ import {
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import {
   Validators,
@@ -29,10 +30,10 @@ export class ExploreCmp implements OnInit {
 
   title:string = "Explore";
   users: string[] = [];
+  userObjects: any[] = [];
   icon = 1;
   usersAndIcon = [];
 
-  selectedUser = {name:"", icon: 0, active: false};
   selectedUserObject = null;
 
   selectedNotification = {notificationId:-1, date:Date, active: false};
@@ -40,20 +41,35 @@ export class ExploreCmp implements OnInit {
 
   calendarEvents = null;
 
-  constructor(private _todoService: ExploreService) {
-
+  constructor(private _todoService: ExploreService, private route: ActivatedRoute,
+              private router: Router) {
+    this.getUserList();
   }
 
   ngOnInit() {
-    this.getUserList();
-    this.getSelectedUser();
-    this.getCalendar();
+    //this.getSelectedUser();
+    //this.getCalendar();
+    this.checkSelectedUser();
   }
 
-  getSelectedUser(){
+  checkSelectedUser(){
     var userList = firebase.database().ref('web/selectedUserObject');
-    userList.on('value', function(snapshot) {
-      this.selectedUserObject = snapshot.val();
+    userList.once('value', function(snapshot) {
+      if(snapshot.val() != null){
+        for(var user of this.userObjects){
+          if(user.id == snapshot.val().id){
+            console.log(user.id);
+            console.log(snapshot.val().id);
+            this.selectedUserObject = user;
+            for(var a of this.usersAndIcon){
+              if(a.userObject.id == snapshot.val().id){
+                a.active = true;
+              }
+            }
+            firebase.database().ref('web/results').remove();
+          }
+        }
+      }
     }.bind(this));
   }
 
@@ -65,44 +81,50 @@ export class ExploreCmp implements OnInit {
   }
 
   getUserList():void {
-    var userList = firebase.database().ref('web/userStrings');
+    var userList = firebase.database().ref('web/test');
     userList.on('value', function(snapshot) {
-      this.users = snapshot.val();
-      for(var user of  this.users){
+      this.userObjects = snapshot.val();
+      for(var user of  this.userObjects){
+        this.users.push(user.id);
         var iconNumber = Math.floor(Math.random() * 34) + 1
-        this.usersAndIcon.push({name: user, icon: iconNumber, active: false});
+        this.usersAndIcon.push({userObject: user, icon: iconNumber, active: false});
       }
     }.bind(this));
   }
 
   userSelected(user):void{
-    if(user.name != this.selectedUser.name){
-      for(var a of this.usersAndIcon){
-        a.active = false;
+    for(var a of this.usersAndIcon){
+      a.active = false;
+    }
+    for(var u of this.userObjects){
+      if(user.userObject == u){
+        user.active = true;
+        this.selectedUserObject = u;
+        this.selectedNotificationObject = null;
+        firebase.database().ref('web/results').remove();
       }
-      user.active = true;
-      this.selectedUser = user;
-      this.selectedUserObject = null;
-      this.selectedNotificationObject = null;
-      var selUser = firebase.database().ref('web/selectedUser');
-      selUser.set(user.name);
     }
   }
 
   notificationSelected(notification:any):void{
-    console.log(notification.notificationId );
-    console.log(this.selectedNotification.notificationId);
-    for(var a of this.selectedUserObject.notifications){
-      a.active = false;
-    }
-    this.selectedNotification.active = true;
-    if(notification.notificationId != this.selectedNotification.notificationId){
-
+    console.log(notification.id );
+    console.log(this.selectedNotification.id);
+    if(notification.id != this.selectedNotification.id){
+      for(var a of this.selectedUserObject.notifications){
+        a.active = false;
+      }
+      notification.active = true;
       this.calendarEvents = null;
       this.selectedNotification = notification;
-      this.selectedNotificationObject = null;
       var selNotification = firebase.database().ref('web/selectedNotification');
       selNotification.set(notification);
     }
   }
+
+  simSingle(){
+    var selNotification = firebase.database().ref('web/fireSingle');
+    selNotification.set(this.selectedNotification);
+    this.router.navigate(['bead-simulation']);
+  }
+
 }

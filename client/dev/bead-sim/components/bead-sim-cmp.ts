@@ -28,21 +28,42 @@ export class BeadSimCmp implements OnInit {
 
   title:string = "Bead Simulation";
 
-  notificationBead: any;
+  selectedUserObject:any;
+  results: any;
+
+  /*notificationBead: any;
   senderBead: any;
   subjectBead: any;
   appBead: any;
   locationBead: any;
-  alertBead: any;
+  alertBead: any;*/
 
   constructor(private _beadSimService: BeadSimService) {}
 
   ngOnInit() {
     console.log("bead simulate init");
-    this.subscribeToWebEvents();
+    this.subscribeToResults();
   }
 
-  subscribeToWebEvents(){
+  subscribeToResults(){
+    firebase.database().ref('web/results').on('value', function(snapshot) {
+      this.results = snapshot.val();
+      this.getSelectedUserObject();
+    }.bind(this));
+  }
+
+  getSelectedUserObject(){
+    firebase.database().ref('web/selectedUserObject').on('value', function(snapshot) {
+      this.selectedUserObject = snapshot.val();
+      console.log(this.selectedUserObject);
+      console.log(this.results);
+      for(var notification of this.selectedUserObject.notifications){
+
+      }
+    }.bind(this));
+  }
+
+  /*subscribeToWebEvents(){
     this.subscribeToNotificaitonBead();
     this.subscribeToSenderBead();
     this.subscribeToSubjectBead();
@@ -53,55 +74,49 @@ export class BeadSimCmp implements OnInit {
 
   subscribeToNotificaitonBead(){
     firebase.database().ref('BeadRepo/NOTIFICATION/').on('value', function(snapshot) {
-      console.log(snapshot.val());
       this.notificationBead = snapshot.val();
     }.bind(this));
   }
 
   subscribeToSenderBead(){
     firebase.database().ref('BeadRepo/SENDER/').on('value', function(snapshot) {
-      console.log(snapshot.val());
       this.senderBead = snapshot.val();
     }.bind(this));
   }
 
   subscribeToSubjectBead(){
     firebase.database().ref('BeadRepo/SUBJECT/').on('value', function(snapshot) {
-      console.log(snapshot.val());
       this.subjectBead = snapshot.val();
     }.bind(this));
   }
 
   subscribeToAppBead(){
     firebase.database().ref('BeadRepo/APPLICATION/').on('value', function(snapshot) {
-      console.log(snapshot.val());
       this.appBead = snapshot.val();
     }.bind(this));
   }
 
   subscribeToLocationInfoBead(){
     firebase.database().ref('BeadRepo/LOCATION/').on('value', function(snapshot) {
-      console.log(snapshot.val());
       this.locationBead = snapshot.val();
     }.bind(this));
   }
 
   subscribeToAlertInfoBead(){
     firebase.database().ref('BeadRepo/ALERT/').on('value', function(snapshot) {
-      console.log(snapshot.val());
       this.alertBead = snapshot.val();
       this.sendNotification();
     }.bind(this));
   }
 
   sendNotification():void{
-    firebase.database().ref('web/selectedNotification').on('value', function(snapshot) {
-      var notification: any = snapshot.val();
-      this.fire(notification);
+    firebase.database().ref('web/selectedUserObject').on('value', function(snapshot) {
+      var user: any = snapshot.val();
+      this.fire(user);
     }.bind(this));
-  }
+  }*/
 
-  fire(notification){
-    firebase.database().ref('web/fire/').set(notification);
+  fire(user){
+    firebase.database().ref('web/fire/').set(user.id);
   }
 }

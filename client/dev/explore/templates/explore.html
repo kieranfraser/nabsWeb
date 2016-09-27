@@ -2,6 +2,8 @@
 
 <div>
   <h1>{{title}}</h1>
+  <button style="float: right;" type="button" routerLink="bead-simulation" routerLinkActive="active" class="btn btn-primary">Simulate</button>
+  <button style="float: right;" type="button" class="btn btn-primary" (click)="simSingle();">Sim Single</button>
 </div>
 
 <div class="row">
@@ -71,7 +73,7 @@
     <div class="row">
       <div *ngIf="selectedUserObject!=null">
 
-        <div class="col-md-6" style="min-height:50px;max-height: 300px; overflow-y: scroll;">
+        <div class="col-md-12" style="min-height:50px;max-height: 250px; overflow-y: scroll;">
           <table class="table">
             <thead>
             <tr>
@@ -88,7 +90,7 @@
             <tbody>
             <tr class="pointer" *ngFor="let notification of selectedUserObject.notifications;" (click)="notificationSelected(notification);"
                 [ngClass]="{ 'selected': notification?.active }">
-              <td>{{notification?.notificationId}}</td>
+              <td>{{notification?.id}}</td>
               <td>{{notification?.date}}</td>
               <td>{{notification?.sender}}</td>
               <td>{{notification?.senderRank}}</td>
@@ -105,7 +107,7 @@
 
 
 
-        <div class="col-md-6" *ngIf="calendarEvents!=null" style="min-height:50px;max-height: 300px; overflow-y: scroll;">
+        <!--<div class="col-md-6" *ngIf="calendarEvents!=null" style="min-height:50px;max-height: 300px; overflow-y: scroll;">
           <div *ngFor="let event of calendarEvents;"
                class="todo-item">
             <div class="row">
@@ -116,7 +118,7 @@
               <h4><strong>End Date:</strong> {{event.endDate}}</h4>
             </div>
           </div>
-        </div>
+        </div>-->
 
       </div>
     </div>

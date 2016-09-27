@@ -1,16 +1,37 @@
-<div class="container">
+<div>
+  <h1>{{title}}</h1>
+</div>
 
-  <div>
-    <h1>{{title}}</h1>
+<div class="col-md-12" style="min-height:50px;max-height: 250px; overflow-y: scroll;">
+  <div *ngIf="selectedUserObject != null">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Id</th>
+        <th>Date</th>
+        <th>Sender</th>
+        <th>Sender Rank</th>
+        <th>Subject</th>
+        <th>Subject Rank</th>
+        <th>App</th>
+        <th>App Rank</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr class="pointer" *ngFor="let notification of selectedUserObject.notifications;" (click)="notificationSelected(notification);"
+          [ngClass]="{ 'selected': notification?.active }">
+        <td>{{notification?.id}}</td>
+        <td>{{notification?.date}}</td>
+        <td>{{notification?.sender}}</td>
+        <td>{{notification?.senderRank}}</td>
+        <td class="tool" data-html="true" data-toggle="tooltip" data-placement="right"
+            title="Dataset: {{notification?.subject?.dataset}} <br> Ground truth: {{notification?.subject?.ground_truth}}">{{notification?.subject?.subject}}</td>
+        <td>{{notification?.subjectRank}}</td>
+        <td data-toggle="tooltip" data-placement="right"
+            title="Category: {{notification?.app?.category}}">{{notification?.app?.name}}</td>
+        <td>{{notification?.appRank}}</td>
+      </tr>
+      </tbody>
+    </table>
   </div>
-
-  <div>
-    <h5>Notification bead: </h5>{{notificationBead?.operational?.informationItem?.informationValue}}<br>
-    <h5>Sender bead: </h5>{{senderBead?.operational?.informationItem?.informationValue}}<br>
-    <h5>Subject bead: </h5>{{subjectBead?.operational?.informationItem?.informationValue}}<br>
-    <h5>App bead: </h5>{{appBead?.operational?.informationItem?.informationValue}}<br>
-    <h5>Location bead: </h5>{{locationBead?.operational?.informationItem?.informationValue}}<br>
-    <h5>Alert bead: </h5>{{alertBead?.operational?.informationItem?.informationValue}}<br>
-  </div>
-
 </div>
