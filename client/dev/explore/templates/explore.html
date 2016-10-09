@@ -2,7 +2,7 @@
 
 <div>
   <h1>{{title}}</h1>
-  <button style="float: right;" type="button" routerLink="bead-simulation" routerLinkActive="active" class="btn btn-primary">Simulate</button>
+  <button style="float: right;" type="button" class="btn btn-primary" (click)="sim();">Simulate</button>
   <button style="float: right;" type="button" class="btn btn-primary" (click)="simSingle();">Sim Single</button>
 </div>
 
@@ -18,6 +18,25 @@
           </div>
         </div>
       </a>
+    </div>
+    <div id="variable">
+      <table class="table table-bordered table-condensed">
+        <tbody>
+        <tr>
+          <h5>Family:</h5>
+          <td><input type="number" class="form-control" [(ngModel)]="variable.family" /></td>
+        </tr>
+        <tr>
+          <h5>Social:</h5>
+          <td><input type="number" class="form-control" [(ngModel)]="variable.social" /></td>
+        </tr>
+        <tr>
+          <h5>Work:</h5>
+          <td><input type="number" class="form-control" [(ngModel)]="variable.work" /></td>
+        </tr>
+        </tbody>
+      </table>
+      <button type="button" class="btn btn-primary" (click)="setVariables();">Save</button>
     </div>
   </div>
 

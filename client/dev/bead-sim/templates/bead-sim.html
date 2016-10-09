@@ -2,36 +2,111 @@
   <h1>{{title}}</h1>
 </div>
 
-<div class="col-md-12" style="min-height:50px;max-height: 250px; overflow-y: scroll;">
-  <div *ngIf="selectedUserObject != null">
-    <table class="table">
-      <thead>
-      <tr>
-        <th>Id</th>
-        <th>Date</th>
-        <th>Sender</th>
-        <th>Sender Rank</th>
-        <th>Subject</th>
-        <th>Subject Rank</th>
-        <th>App</th>
-        <th>App Rank</th>
-      </tr>
-      </thead>
+<div class="col-md-2" >
+  <div id="variable" *ngIf="variable != null">
+    <table class="table table-bordered table-condensed">
       <tbody>
-      <tr class="pointer" *ngFor="let notification of selectedUserObject.notifications;" (click)="notificationSelected(notification);"
-          [ngClass]="{ 'selected': notification?.active }">
-        <td>{{notification?.id}}</td>
-        <td>{{notification?.date}}</td>
-        <td>{{notification?.sender}}</td>
-        <td>{{notification?.senderRank}}</td>
-        <td class="tool" data-html="true" data-toggle="tooltip" data-placement="right"
-            title="Dataset: {{notification?.subject?.dataset}} <br> Ground truth: {{notification?.subject?.ground_truth}}">{{notification?.subject?.subject}}</td>
-        <td>{{notification?.subjectRank}}</td>
-        <td data-toggle="tooltip" data-placement="right"
-            title="Category: {{notification?.app?.category}}">{{notification?.app?.name}}</td>
-        <td>{{notification?.appRank}}</td>
+      <tr>
+        <h5>Family:</h5>
+        <td><input type="number" class="form-control" [(ngModel)]="variable.family" /></td>
+      </tr>
+      <tr>
+        <h5>Social:</h5>
+        <td><input type="number" class="form-control" [(ngModel)]="variable.social" /></td>
+      </tr>
+      <tr>
+        <h5>Work:</h5>
+        <td><input type="number" class="form-control" [(ngModel)]="variable.work" /></td>
       </tr>
       </tbody>
     </table>
+    <button type="button" class="btn btn-primary" (click)="setVariables();">Save</button>
+    <button type="button" class="btn btn-primary" (click)="fire();">Simulate</button>
+    <button type="button" class="btn btn-primary" (click)="clear();">Clear</button>
+  </div>
+</div>
+
+<div id="results" class="col-md-10" style="min-height:50px;max-height: 500px; overflow-y: scroll;">
+  <div *ngIf="selectedUserObject != null && tableResultArray != null"  style="white-space:nowrap">
+    <div style="display: inline-block" *ngFor="let fireResult of tableResultArray; let isEven = even;">
+      <table class="table" [style.background-color]="isEven ? 'rgb(138, 182, 184)' : 'rgb(138, 150, 184)'" >
+        <thead>
+        <tr>
+          <th>Id</th>
+          <th>Result</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="pointer" *ngFor="let result of fireResult?.a;" data-toggle="modal" data-target="#notificationDetail"
+            (click)="showNotificationDetail(result.id, result.resultObject.result.trim());">
+          <td>{{result.id}}</td>
+          <td>{{result.resultObject.result.trim()}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="notificationDetail" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content" *ngIf="selectedNotification != null">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h2 *ngIf="selectedResult != null">Result: {{selectedResult}}</h2>
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Id</th>
+            <th>Delivered</th>
+            <th>Sender</th>
+            <th>Subject</th>
+            <th>App</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>{{selectedNotification?.id}}</td>
+            <td>{{selectedNotification?.date}}</td>
+            <td>{{selectedNotification?.sender}}</td>
+            <td>{{selectedNotification?.subject.subject}}</td>
+            <td>{{selectedNotification?.app.name}}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-body">
+
+        <div *ngIf="calendarEvents!=null" style="min-height:50px;max-height: 300px; overflow-y: scroll;">
+
+          <table class="table">
+            <thead>
+            <tr>
+              <th>Summary</th>
+              <th>Description</th>
+              <th>Start</th>
+              <th>End</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="pointer" *ngFor="let event of calendarEvents;">
+              <td>{{event?.summary}}</td>
+              <td>{{event?.description}}</td>
+              <td>{{event?.startDate}}</td>
+              <td>{{event?.endDate}}</td>
+            </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
   </div>
 </div>

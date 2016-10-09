@@ -20,25 +20,49 @@ var BeadSimCmp = (function () {
     function BeadSimCmp(_beadSimService) {
         this._beadSimService = _beadSimService;
         this.title = "Bead Simulation";
+        this.results = [];
+        this.resultArray = [];
+        this.tableResultArray = [];
+        this.variable = null;
+        this.calendarEvents = null;
+        this.selectedResult = null;
     }
     BeadSimCmp.prototype.ngOnInit = function () {
         console.log("bead simulate init");
+        this.tableResultArray = [];
+        this.counter = -1;
+        this.subscribeToVariable();
+        if (localStorage.getItem("fireType") == "multiple") {
+            console.log(localStorage.getItem("fireType"));
+            this.getSelectedUserObject();
+        }
         this.subscribeToResults();
     };
     BeadSimCmp.prototype.subscribeToResults = function () {
         firebase.database().ref('web/results').on('value', function (snapshot) {
-            this.results = snapshot.val();
-            this.getSelectedUserObject();
+            if (snapshot.val() != null) {
+                var array = [];
+                this.results = snapshot.val();
+                for (var i = 1; i < this.results.length; i++) {
+                    array.push({ id: i, resultObject: this.results[i.toString()] });
+                }
+                this.resultArray.push(array);
+                this.tableResultArray[this.counter] = { a: this.resultArray[this.resultArray.length - 1] };
+                console.log("results changed!");
+            }
+        }.bind(this));
+    };
+    BeadSimCmp.prototype.subscribeToVariable = function () {
+        firebase.database().ref('web/variable').on('value', function (snapshot) {
+            if (snapshot.val() != null) {
+                this.variable = snapshot.val();
+            }
         }.bind(this));
     };
     BeadSimCmp.prototype.getSelectedUserObject = function () {
-        firebase.database().ref('web/selectedUserObject').on('value', function (snapshot) {
+        firebase.database().ref('web/selectedUserObject').once('value', function (snapshot) {
             this.selectedUserObject = snapshot.val();
-            console.log(this.selectedUserObject);
-            console.log(this.results);
-            for (var _i = 0, _a = this.selectedUserObject.notifications; _i < _a.length; _i++) {
-                var notification = _a[_i];
-            }
+            this.fire();
         }.bind(this));
     };
     /*subscribeToWebEvents(){
@@ -93,8 +117,65 @@ var BeadSimCmp = (function () {
         this.fire(user);
       }.bind(this));
     }*/
-    BeadSimCmp.prototype.fire = function (user) {
-        firebase.database().ref('web/fire/').set(user.id);
+    BeadSimCmp.prototype.fire = function () {
+        console.log(this.counter);
+        this.counter = this.counter + 1;
+        firebase.database().ref('web/results/').remove();
+        firebase.database().ref('web/fire/').remove();
+        firebase.database().ref('web/fire/').set(this.selectedUserObject.id);
+    };
+    BeadSimCmp.prototype.setVariables = function () {
+        firebase.database().ref('web/variable').set(this.variable);
+    };
+    BeadSimCmp.prototype.clear = function () {
+        this.counter = -1;
+        this.resultArray = [];
+        this.tableResultArray = [];
+    };
+    BeadSimCmp.prototype.showNotificationDetail = function (notificationId, result) {
+        for (var _i = 0, _a = this.selectedUserObject.notifications; _i < _a.length; _i++) {
+            var notification = _a[_i];
+            if (notification.id == notificationId) {
+                this.selectedResult = result;
+                //notification.date = this.stringToDate(notification.date);
+                this.selectedNotification = notification;
+                firebase.database().ref('web/selectedNotification').set(notification);
+                this.getCalendar();
+            }
+        }
+    };
+    BeadSimCmp.prototype.getCalendar = function () {
+        var calendarList = firebase.database().ref('web/calendarEvents');
+        calendarList.on('value', function (snapshot) {
+            this.calendarEvents = snapshot.val();
+            this.convertDates();
+        }.bind(this));
+    };
+    //as months are indexed from 0 in js
+    BeadSimCmp.prototype.convertDates = function () {
+        for (var _i = 0, _a = this.calendarEvents; _i < _a.length; _i++) {
+            var event = _a[_i];
+            //event.endDate = this.stringToDate(event.endDate);
+            //event.startDate = this.stringToDate(event.startDate);
+            var d = new Date(event.endDate);
+            event.endDate = d;
+            d = new Date(event.startDate);
+            event.startDate = d;
+        }
+    };
+    BeadSimCmp.prototype.stringToDate = function (date) {
+        var res = date.split(" ");
+        var splitDate = res[0].split("/");
+        var splitTime = res[1].split(":");
+        var day = Number(splitDate[0]);
+        var month = Number(splitDate[1]) - 1;
+        var year = Number(splitDate[2]) + 2000;
+        var hh = Number(splitTime[0]);
+        var mm = Number(splitTime[1]);
+        var ss = Number(splitTime[2]);
+        var convertedDate = new Date(Date.UTC(year, month, day, hh, mm, ss));
+        convertedDate.setTime(convertedDate.getTime() + convertedDate.getTimezoneOffset() * 60 * 1000);
+        return convertedDate;
     };
     BeadSimCmp = __decorate([
         core_1.Component({

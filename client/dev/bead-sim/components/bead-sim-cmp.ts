@@ -29,7 +29,19 @@ export class BeadSimCmp implements OnInit {
   title:string = "Bead Simulation";
 
   selectedUserObject:any;
-  results: any;
+  results: any = [];
+
+  resultArray: any = [];
+
+  tableResultArray: any = [];
+
+  variable:any = null;
+
+  counter: number;
+
+  selectedNotification: any;
+  calendarEvents = null;
+  selectedResult = null;
 
   /*notificationBead: any;
   senderBead: any;
@@ -42,24 +54,45 @@ export class BeadSimCmp implements OnInit {
 
   ngOnInit() {
     console.log("bead simulate init");
+    this.tableResultArray = [];
+    this.counter = -1;
+    this.subscribeToVariable();
+    if(localStorage.getItem("fireType") == "multiple"){
+      console.log(localStorage.getItem("fireType"));
+      this.getSelectedUserObject();
+    }
     this.subscribeToResults();
   }
 
   subscribeToResults(){
     firebase.database().ref('web/results').on('value', function(snapshot) {
-      this.results = snapshot.val();
-      this.getSelectedUserObject();
+      if(snapshot.val() != null){
+        var array = [];
+        this.results = snapshot.val();
+        for(var i=1; i<this.results.length; i++){
+          array.push({id: i, resultObject: this.results[i.toString()]})
+        }
+        this.resultArray.push(array);
+        this.tableResultArray[this.counter] = {a:this.resultArray[this.resultArray.length - 1]};
+        console.log("results changed!");
+      }
+
+    }.bind(this));
+  }
+
+  subscribeToVariable(){
+    firebase.database().ref('web/variable').on('value', function(snapshot) {
+      if(snapshot.val() != null){
+        this.variable = snapshot.val();
+      }
+
     }.bind(this));
   }
 
   getSelectedUserObject(){
-    firebase.database().ref('web/selectedUserObject').on('value', function(snapshot) {
+    firebase.database().ref('web/selectedUserObject').once('value', function(snapshot) {
       this.selectedUserObject = snapshot.val();
-      console.log(this.selectedUserObject);
-      console.log(this.results);
-      for(var notification of this.selectedUserObject.notifications){
-
-      }
+      this.fire();
     }.bind(this));
   }
 
@@ -116,7 +149,73 @@ export class BeadSimCmp implements OnInit {
     }.bind(this));
   }*/
 
-  fire(user){
-    firebase.database().ref('web/fire/').set(user.id);
+  fire(){
+    console.log(this.counter);
+    this.counter = this.counter + 1;
+
+    firebase.database().ref('web/results/').remove();
+    firebase.database().ref('web/fire/').remove();
+    firebase.database().ref('web/fire/').set(this.selectedUserObject.id);
   }
+
+  setVariables(){
+    firebase.database().ref('web/variable').set(this.variable);
+  }
+
+  clear(){
+    this.counter=-1;
+    this.resultArray=[];
+    this.tableResultArray =[];
+  }
+
+  showNotificationDetail(notificationId, result){
+    for(var notification of this.selectedUserObject.notifications){
+      if(notification.id == notificationId){
+        this.selectedResult = result;
+        //notification.date = this.stringToDate(notification.date);
+        this.selectedNotification = notification;
+        firebase.database().ref('web/selectedNotification').set(notification);
+        this.getCalendar();
+      }
+    }
+  }
+
+  getCalendar(){
+    var calendarList = firebase.database().ref('web/calendarEvents');
+    calendarList.on('value', function(snapshot) {
+      this.calendarEvents  = snapshot.val();
+      this.convertDates();
+    }.bind(this));
+  }
+
+  //as months are indexed from 0 in js
+  convertDates(){
+    for(var event of this.calendarEvents){
+      //event.endDate = this.stringToDate(event.endDate);
+      //event.startDate = this.stringToDate(event.startDate);
+      var d = new Date(event.endDate);
+      event.endDate = d;
+      d = new Date(event.startDate);
+      event.startDate = d;
+    }
+  }
+
+  stringToDate(date){
+    var res = date.split(" ");
+    var splitDate = res[0].split("/");
+    var splitTime = res[1].split(":");
+
+    var day = Number(splitDate[0]);
+    var month = Number(splitDate[1]) - 1
+    var year = Number(splitDate[2])+2000;
+
+    var hh = Number(splitTime[0]);
+    var mm = Number(splitTime[1]);
+    var ss = Number(splitTime[2]);
+
+    var convertedDate = new Date(Date.UTC(year, month, day, hh, mm, ss));
+    convertedDate.setTime( convertedDate.getTime() + convertedDate.getTimezoneOffset()*60*1000 );
+    return convertedDate;
+  }
+
 }

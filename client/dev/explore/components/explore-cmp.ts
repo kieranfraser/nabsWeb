@@ -34,9 +34,11 @@ export class ExploreCmp implements OnInit {
   icon = 1;
   usersAndIcon = [];
 
+  variable:any = {family: 10, social: 5, work: 7};
+
   selectedUserObject = null;
 
-  selectedNotification = {notificationId:-1, date:Date, active: false};
+  selectedNotification = {id:-1, date:Date, active: false};
   selectedNotificationObject = null;
 
   calendarEvents = null;
@@ -97,11 +99,12 @@ export class ExploreCmp implements OnInit {
       a.active = false;
     }
     for(var u of this.userObjects){
-      if(user.userObject == u){
+      if(user.userObject.id == u.id){
         user.active = true;
-        this.selectedUserObject = u;
+        this.selectedUserObject = user.userObject;
         this.selectedNotificationObject = null;
         firebase.database().ref('web/results').remove();
+        firebase.database().ref('web/selectedUserObject').set(user.userObject);
       }
     }
   }
@@ -122,9 +125,19 @@ export class ExploreCmp implements OnInit {
   }
 
   simSingle(){
+    localStorage.setItem("fireType", "single");
     var selNotification = firebase.database().ref('web/fireSingle');
     selNotification.set(this.selectedNotification);
     this.router.navigate(['bead-simulation']);
+  }
+
+  sim(){
+    localStorage.setItem("fireType", "multiple");
+    this.router.navigate(['bead-simulation']);
+  }
+
+  setVariables(){
+    firebase.database().ref('web/variable').set(this.variable);
   }
 
 }

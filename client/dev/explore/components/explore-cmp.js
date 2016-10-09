@@ -21,8 +21,9 @@ var ExploreCmp = (function () {
         this.userObjects = [];
         this.icon = 1;
         this.usersAndIcon = [];
+        this.variable = { family: 10, social: 5, work: 7 };
         this.selectedUserObject = null;
-        this.selectedNotification = { notificationId: -1, date: Date, active: false };
+        this.selectedNotification = { id: -1, date: Date, active: false };
         this.selectedNotificationObject = null;
         this.calendarEvents = null;
         this.getUserList();
@@ -79,11 +80,12 @@ var ExploreCmp = (function () {
         }
         for (var _b = 0, _c = this.userObjects; _b < _c.length; _b++) {
             var u = _c[_b];
-            if (user.userObject == u) {
+            if (user.userObject.id == u.id) {
                 user.active = true;
-                this.selectedUserObject = u;
+                this.selectedUserObject = user.userObject;
                 this.selectedNotificationObject = null;
                 firebase.database().ref('web/results').remove();
+                firebase.database().ref('web/selectedUserObject').set(user.userObject);
             }
         }
     };
@@ -103,9 +105,17 @@ var ExploreCmp = (function () {
         }
     };
     ExploreCmp.prototype.simSingle = function () {
+        localStorage.setItem("fireType", "single");
         var selNotification = firebase.database().ref('web/fireSingle');
         selNotification.set(this.selectedNotification);
         this.router.navigate(['bead-simulation']);
+    };
+    ExploreCmp.prototype.sim = function () {
+        localStorage.setItem("fireType", "multiple");
+        this.router.navigate(['bead-simulation']);
+    };
+    ExploreCmp.prototype.setVariables = function () {
+        firebase.database().ref('web/variable').set(this.variable);
     };
     ExploreCmp = __decorate([
         core_1.Component({
