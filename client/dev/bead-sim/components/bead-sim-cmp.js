@@ -11,12 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var bead_sim_service_1 = require('../services/bead-sim-service');
 var BeadSimCmp = (function () {
-    /*notificationBead: any;
-    senderBead: any;
-    subjectBead: any;
-    appBead: any;
-    locationBead: any;
-    alertBead: any;*/
     function BeadSimCmp(_beadSimService) {
         this._beadSimService = _beadSimService;
         this.title = "Bead Simulation";
@@ -26,6 +20,18 @@ var BeadSimCmp = (function () {
         this.variable = null;
         this.calendarEvents = null;
         this.selectedResult = null;
+        /*notificationBead: any;
+        senderBead: any;
+        subjectBead: any;
+        appBead: any;
+        locationBead: any;
+        alertBead: any;*/
+        // Constants //
+        this.result1 = "now";
+        this.result2 = "break";
+        this.result3 = "period";
+        this.result4 = "Little";
+        this.result5 = "Much";
     }
     BeadSimCmp.prototype.ngOnInit = function () {
         console.log("bead simulate init");
@@ -139,6 +145,15 @@ var BeadSimCmp = (function () {
                 this.selectedResult = result;
                 //notification.date = this.stringToDate(notification.date);
                 this.selectedNotification = notification;
+                if (this.selectedNotification.subject.subject == "family") {
+                    this.selectedNotification.subjectRank = this.variable.family;
+                }
+                if (this.selectedNotification.subject.subject == "work") {
+                    this.selectedNotification.subjectRank = this.variable.work;
+                }
+                if (this.selectedNotification.subject.subject == "social") {
+                    this.selectedNotification.subjectRank = this.variable.social;
+                }
                 firebase.database().ref('web/selectedNotification').set(notification);
                 this.getCalendar();
             }
@@ -176,6 +191,24 @@ var BeadSimCmp = (function () {
         var convertedDate = new Date(Date.UTC(year, month, day, hh, mm, ss));
         convertedDate.setTime(convertedDate.getTime() + convertedDate.getTimezoneOffset() * 60 * 1000);
         return convertedDate;
+    };
+    BeadSimCmp.prototype.diffResult = function (index, prevIndex, resultId) {
+        console.log("index - " + index);
+        console.log("Prev index -" + prevIndex);
+        console.log("resultId - " + resultId);
+        if (index > 0) {
+            var firstArray = this.tableResultArray[prevIndex];
+            var secondArray = this.tableResultArray[index];
+            var firstResult = firstArray.a[resultId];
+            var secondResult = secondArray.a[resultId];
+            if (firstResult.resultObject.result != secondResult.resultObject.result) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        return false;
     };
     BeadSimCmp = __decorate([
         core_1.Component({

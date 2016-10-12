@@ -50,6 +50,13 @@ export class BeadSimCmp implements OnInit {
   locationBead: any;
   alertBead: any;*/
 
+  // Constants //
+  result1 = "now";
+  result2 = "break";
+  result3 = "period";
+  result4 = "Little";
+  result5 = "Much";
+
   constructor(private _beadSimService: BeadSimService) {}
 
   ngOnInit() {
@@ -174,6 +181,15 @@ export class BeadSimCmp implements OnInit {
         this.selectedResult = result;
         //notification.date = this.stringToDate(notification.date);
         this.selectedNotification = notification;
+        if(this.selectedNotification.subject.subject == "family"){
+          this.selectedNotification.subjectRank = this.variable.family;
+        }
+        if(this.selectedNotification.subject.subject == "work"){
+          this.selectedNotification.subjectRank = this.variable.work;
+        }
+        if(this.selectedNotification.subject.subject == "social"){
+          this.selectedNotification.subjectRank = this.variable.social;
+        }
         firebase.database().ref('web/selectedNotification').set(notification);
         this.getCalendar();
       }
@@ -216,6 +232,29 @@ export class BeadSimCmp implements OnInit {
     var convertedDate = new Date(Date.UTC(year, month, day, hh, mm, ss));
     convertedDate.setTime( convertedDate.getTime() + convertedDate.getTimezoneOffset()*60*1000 );
     return convertedDate;
+  }
+
+  diffResult(index, prevIndex, resultId){
+    console.log("index - "+index);
+    console.log("Prev index -" +prevIndex);
+    console.log("resultId - "+ resultId);
+
+    if(index > 0){
+      var firstArray = this.tableResultArray[prevIndex];
+      var secondArray = this.tableResultArray[index];
+
+
+      var firstResult = firstArray.a[resultId];
+      var secondResult = secondArray.a[resultId];
+
+      if(firstResult.resultObject.result != secondResult.resultObject.result){
+        return true;
+      }
+      else{
+        return false;
+      }
+    }
+    return false;
   }
 
 }

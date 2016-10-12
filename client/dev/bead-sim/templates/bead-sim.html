@@ -28,7 +28,8 @@
 
 <div id="results" class="col-md-10" style="min-height:50px;max-height: 500px; overflow-y: scroll;">
   <div *ngIf="selectedUserObject != null && tableResultArray != null"  style="white-space:nowrap">
-    <div style="display: inline-block" *ngFor="let fireResult of tableResultArray; let isEven = even;">
+    <div style="display: inline-block" *ngFor="let fireResult of tableResultArray; let isEven = even; let i = index;">
+
       <table class="table" [style.background-color]="isEven ? 'rgb(138, 182, 184)' : 'rgb(138, 150, 184)'" >
         <thead>
         <tr>
@@ -38,12 +39,15 @@
         </thead>
         <tbody>
         <tr class="pointer" *ngFor="let result of fireResult?.a;" data-toggle="modal" data-target="#notificationDetail"
-            (click)="showNotificationDetail(result.id, result.resultObject.result.trim());">
+            (click)="showNotificationDetail(result.id, result.resultObject.result.trim());"
+            [style.background-color]="diffResult(i , i-1, result.id - 1) ? '#d9534f' :
+              (isEven ? 'rgb(138, 182, 184)' : 'rgb(138, 150, 184)')">
           <td>{{result.id}}</td>
           <td>{{result.resultObject.result.trim()}}</td>
         </tr>
         </tbody>
       </table>
+
     </div>
   </div>
 </div>
@@ -63,8 +67,11 @@
             <th>Id</th>
             <th>Delivered</th>
             <th>Sender</th>
+            <th>Rank</th>
             <th>Subject</th>
+            <th>Rank</th>
             <th>App</th>
+            <th>Rank</th>
           </tr>
           </thead>
           <tbody>
@@ -72,8 +79,11 @@
             <td>{{selectedNotification?.id}}</td>
             <td>{{selectedNotification?.date}}</td>
             <td>{{selectedNotification?.sender}}</td>
+            <td>{{selectedNotification?.senderRank}}</td>
             <td>{{selectedNotification?.subject.subject}}</td>
+            <td>{{selectedNotification?.subjectRank}}</td>
             <td>{{selectedNotification?.app.name}}</td>
+            <td>{{selectedNotification?.appRank}}</td>
           </tr>
           </tbody>
         </table>
